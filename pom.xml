@@ -3,7 +3,7 @@
   <groupId>net.craftminecraft.bukkit</groupId>
   <artifactId>ipwhitelist</artifactId>
   <version>1.8</version>
-  <name>IPWhitelist</name>
+  <name>IPWhitelistFix</name>
   <description>Whitelist by IP - Supports spigot's BungeeCord.</description>
   <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
