@@ -30,22 +30,25 @@ public class PlayerListener implements Listener {
             this.plugin.getBungeeIPs().whitelist(addresses.get(ev.getPlayer().getUniqueId()).getHostAddress());
         }
     }
+    
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onPlayerPreLogin(PlayerPreLoginEvent ev) {
+    	for (Player player : Bukkit.getOnlinePlayers()) {
+    		if ((player.getName().equalsIgnoreCase(ev.getName())) || (player.getUniqueId().equals(ev.getUniqueId())) || (player.getUniqueId().toString().toLowerCase().replaceAll("-", "").equalsIgnoreCase(ev.getUniqueId().toString().toLowerCase().replaceAll("-", "")))) {
+            	ev.setKickMessage("Ya hay un jugador conectado con ese nick!");
+    			ev.setResult(PlayerPreLoginEvent.Result.KICK_WHITELIST);
+    			return;
+    		}
+    	}
+    }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onPlayerLogin(final PlayerLoginEvent ev) {
         final InetAddress addr = ev.getRealAddress();
-        this.plugin.debug("Player " + ev.getPlayer().getName() + " is connecting with IP : " + addr);
-        if (this.plugin.getBungeeIPs().isSetupModeEnabled()) {
-            addresses.put(ev.getPlayer().getUniqueId(), addr);
-            this.plugin.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, () -> {
-                if (this.plugin.getBungeeIPs().isSetupModeEnabled())
-                    ev.getPlayer().kickPlayer("Server is in setup mode");
-                else if (!this.plugin.getBungeeIPs().allow(addr))
-                    ev.getPlayer().kickPlayer(ChatColor.translateAlternateColorCodes('&', this.plugin.getBungeeIPs().getKickMsg()));
-            }, 20L);
-        } else if (!this.plugin.getBungeeIPs().allow(addr)) {
-            ev.setKickMessage(ChatColor.translateAlternateColorCodes('&', this.plugin.getBungeeIPs().getKickMsg()));
-            ev.setResult(PlayerLoginEvent.Result.KICK_WHITELIST);
+        if (!this.plugin.allow(addr)) {
+        	ev.setKickMessage(ChatColor.translateAlternateColorCodes('&', this.plugin.getConfig().getString("playerKickMessage")));
+        	ev.setResult(PlayerLoginEvent.Result.KICK_WHITELIST);
+        	return;
         }
     }
 }
